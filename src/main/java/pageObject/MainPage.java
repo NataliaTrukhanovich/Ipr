@@ -1,6 +1,7 @@
-package PageObject;
+package pageObject;
 
 import core.BasePage;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -9,17 +10,17 @@ public class MainPage extends BasePage {
 
     @FindBy(xpath = "//img[@class='vkc__Avatar__img vkc__Avatar__size48 vkc__Avatar__square']")
     private WebElement avatar;
-    @FindBy(xpath = "//span[@class='vkuiPlaceholder__title vkuiTitle__sizeYNone vkuiTitle__level2 vkuiTypography__host vkuiTypography__normalize vkuiTypography__weight2 vkuiRootComponent__host']")
+    @FindBy(xpath = "//h1[contains(text(), 'Вход в «Mail»')]")
     private WebElement title;
     @FindBy(id = "email")
     private WebElement email;
-    @FindBy(xpath = "//span[@class='vkuiSelect__title vkuiText__host vkuiText__sizeYNone vkuiTypography__host vkuiTypography__normalize vkuiTypography__weight3 vkuiRootComponent__host']")
+    @FindBy(xpath = "//span[contains(text(), '@mail.ru')]")
     private WebElement host;
     @FindBy(xpath = "//div[@class='vkc__Checkbox__icon vkc__Checkbox__checkboxOn']")
     private WebElement saveUserCheckbox;
     @FindBy(xpath = "//div[@class='vkc__Checkbox__content']")
     private WebElement saveUserCheckboxTitle;
-    @FindBy(xpath = "//button[@class='vkc__SaveUserCheckbox__iconButton vkc__SaveUserCheckbox__rightIconButton vkuiInternalTappable vkuiIconButton__host vkuiIconButton__sizeYNone vkuiTappable__host vkuiTappable__sizeXNone vkuiTappable__hasPointerNone vkuiClickable__host vkuiClickable__realClickable vkuistyles__-focus-visible vkuiRootComponent__host']")
+    @FindBy(xpath = "//button[contains(@aria-label, 'сохранить данные аккаунта')]")
     private WebElement saveUserCheckboxIcon;
     @FindBy(xpath = "//button[@data-test-id='continue-button']")
     private WebElement continueButton;
@@ -28,7 +29,8 @@ public class MainPage extends BasePage {
     @FindBy(xpath = "//span[@data-test-id='error-message']")
     private WebElement errorMessage;
 
-    public MainPage() {
+    public MainPage(WebDriver driver) {
+        super(driver);
         PageFactory.initElements(driver, this);
     }
 
@@ -72,15 +74,15 @@ public class MainPage extends BasePage {
         return saveUserCheckbox.getDomAttribute("class").contains("checkboxOn");
     }
 
-    public String isContinueButtonDisabled() {
-        return continueButton.getDomAttribute("disabled");
+    public Boolean isContinueButtonEnabled() {
+        return continueButton.isEnabled();
     }
 
     public boolean isErrorMessageDisplayed() {
         return errorMessage.isDisplayed();
     }
 
-    public String getErrorMessageText(){
+    public String getErrorMessageText() {
         return errorMessage.getText();
     }
 

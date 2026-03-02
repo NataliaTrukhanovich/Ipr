@@ -8,20 +8,17 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.time.Duration;
 
-import static core.BasePage.setDriver;
-
-abstract public class BaseTest {
+public abstract class BaseTest {
     protected WebDriver driver;
 
     @BeforeAll
-    public void setUp() {
+    public void setUpDriver() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
-        setDriver(driver);
     }
 
     @AfterAll

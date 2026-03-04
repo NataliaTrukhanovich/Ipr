@@ -11,16 +11,22 @@ import java.util.List;
 
 public class JdbcCrud {
 
-    static final String DB_URL = "jdbc:mysql://localhost:3306/ipr_db" ;
-    static final String USER = "ipruser" ;
-    static final String PWD = "iprpwd" ;
+    static final String DB_URL = "jdbc:mysql://localhost:3306/ipr_db";
+    static final String USER = "ipruser";
+    static final String PWD = "iprpwd";
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
-        createAndFillInTables();
-        //createNewProduct();
-        //updateProduct();
-        //deleteProduct();
+        try {
+            createAndFillInTables();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+        createNewProduct();
+        updateProduct();
+        deleteProduct();
         selectProduct();
         selectProductsWithSales();
     }
@@ -39,21 +45,25 @@ public class JdbcCrud {
             ps.executeUpdate();
 
         } catch (SQLException e) {
+            System.out.println("Не удалось создать новую запись");
             e.printStackTrace();
         }
     }
 
     private static void updateProduct() {
 
+        String productName = "Pear";
+
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
              PreparedStatement ps =
                      connection.prepareStatement("UPDATE products SET in_stock = 10 WHERE product_name = ?")) {
-            String productName = "pear" ;
-            ps.setString(1, productName);
 
+            ps.setString(1, productName);
+            System.out.println(ps);
             ps.executeUpdate();
 
         } catch (SQLException e) {
+            System.out.println("Не удалось обновить запись");
             e.printStackTrace();
         }
     }
@@ -63,22 +73,24 @@ public class JdbcCrud {
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
              PreparedStatement ps =
                      connection.prepareStatement("DELETE FROM products WHERE product_name = ?")) {
-            String productName = "apple" ;
+            String productName = "apple";
             ps.setString(1, productName);
 
             ps.executeUpdate();
 
         } catch (SQLException e) {
+            System.out.println("Не удалось удалить запись из таблицы");
             e.printStackTrace();
         }
     }
 
     private static void selectProduct() {
 
+        String productName = "carrot";
+
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
              PreparedStatement ps =
                      connection.prepareStatement("SELECT * FROM products WHERE product_name = ?")) {
-            String productName = "carrot" ;
             ps.setString(1, productName);
 
             ResultSet rs = ps.executeQuery();
@@ -93,6 +105,7 @@ public class JdbcCrud {
             }
 
         } catch (SQLException e) {
+            System.out.println("Записи с product_name = " + productName + " не найдены");
             e.printStackTrace();
         }
     }
@@ -110,7 +123,7 @@ public class JdbcCrud {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ProductsWithSales productsWithSales = new ProductsWithSales();
-                productsWithSales.setProductId(rs.getInt("product_id"));
+                productsWithSales.setProductId(rs.getLong("product_id"));
                 productsWithSales.setProductName(rs.getString("product_name"));
                 productsWithSales.setCategory(rs.getString("category"));
                 productsWithSales.setQuantity(rs.getInt("quantity"));
@@ -120,18 +133,24 @@ public class JdbcCrud {
             }
 
         } catch (SQLException e) {
+            System.out.println("Записи по запросу не найдены");
             e.printStackTrace();
         }
     }
 
     private static void createAndFillInTables() throws SQLException {
 
+        System.out.println("Создаём 2 таблицы: Products и Sales. Наполняем их данными");
+
+        String dropProductsTable = "DROP TABLE IF EXISTS products";
+        String dropSalesTable = "DROP TABLE IF EXISTS sales";
+
         String createProductsTable = " CREATE TABLE IF NOT EXISTS products (" +
                 "product_id   BIGINT NOT NULL AUTO_INCREMENT, " +
                 "product_name VARCHAR(50) NOT NULL, " +
                 "category     VARCHAR(50), " +
                 "in_stock     INT," +
-                "PRIMARY KEY (product_id))" ;
+                "PRIMARY KEY (product_id))";
         String createSalesTable = "CREATE TABLE IF NOT EXISTS sales (" +
                 "sale_id     BIGINT NOT NULL AUTO_INCREMENT," +
                 "product_id  BIGINT NOT NULL," +
@@ -139,7 +158,7 @@ public class JdbcCrud {
                 "price       DECIMAL(10,2) NOT NULL," +
                 "CONSTRAINT FOREIGN KEY (product_id) REFERENCES products(product_id)" +
                 "ON DELETE CASCADE," +
-                "PRIMARY KEY (sale_id))" ;
+                "PRIMARY KEY (sale_id))";
 
         List<Product> products = new ArrayList<>();
         products.add(new Product("Apple", "Fruits", 87));
@@ -158,34 +177,46 @@ public class JdbcCrud {
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD)) {
 
-            try (PreparedStatement ps = connection.prepareStatement(createProductsTable)) {
-                ps.executeUpdate();
-            }
-            try (PreparedStatement ps = connection.prepareStatement(createSalesTable)) {
-                ps.executeUpdate();
-            }
-
-            try (PreparedStatement ps =
-                         connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
-
-                for (int i = 0; i < products.size(); i++) {
-                    ps.setString(1, products.get(i).getProductName());
-                    ps.setString(2, products.get(i).getCategory());
-                    ps.setInt(3, products.get(i).getInStock());
-
-                    ps.executeUpdate();
+            connection.setAutoCommit(false);
+            try {
+                try (Statement stm = connection.createStatement()) {
+                    stm.executeUpdate(dropSalesTable);
+                    stm.executeUpdate(dropProductsTable);
+                    stm.executeUpdate(createProductsTable);
+                    stm.executeUpdate(createSalesTable);
                 }
-            }
-            try (PreparedStatement ps =
-                         connection.prepareStatement("INSERT INTO sales (product_id, quantity, price) VALUES (?, ?, ?)")) {
 
-                for (int i = 0; i < sales.size(); i++) {
-                    ps.setInt(1, sales.get(i).getProductId());
-                    ps.setInt(2, sales.get(i).getQuantity());
-                    ps.setBigDecimal(3, sales.get(i).getPrice());
+                try (PreparedStatement ps =
+                             connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
 
-                    ps.executeUpdate();
+                    for (Product product : products) {
+                        ps.setString(1, product.getProductName());
+                        ps.setString(2, product.getCategory());
+                        ps.setInt(3, product.getInStock());
+
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
                 }
+                try (PreparedStatement ps =
+                             connection.prepareStatement("INSERT INTO sales (product_id, quantity, price) VALUES (?, ?, ?)")) {
+
+                    for (Sale sale : sales) {
+                        ps.setInt(1, sale.getProductId());
+                        ps.setInt(2, sale.getQuantity());
+                        ps.setBigDecimal(3, sale.getPrice());
+
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                }
+
+                connection.commit();
+
+            } catch (SQLException e) {
+                connection.rollback();
+                System.out.println("Ошибка при создании и/или заполнении таблиц. Выполнен rollback");
+                throw new SQLException("Не удалось создать и/или заполнить таблицу", e);
             }
         }
     }

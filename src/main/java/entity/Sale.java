@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 public class Sale {
+
     private Long saleId;
     private Integer productId;
     private Integer quantity;

@@ -1,29 +1,36 @@
 package jdbc;
 
+
 import entity.Product;
 import entity.ProductsWithSales;
 import entity.Sale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static services.ConfigProvider.config;
+
 public class JdbcCrud {
 
-    static final String DB_URL = "jdbc:mysql://localhost:3306/ipr_db";
-    static final String USER = "ipruser";
-    static final String PWD = "iprpwd";
+    private static final Logger logger = LoggerFactory.getLogger(JdbcCrud.class);
+    static final String DB_URL = config.getString("db_url");
+    static final String USER = config.getString("db_user");
+    static final String PWD = config.getString("db_pass");
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
-        try {
-            createAndFillInTables();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            return;
-        }
+        createAndFillInTables();
+
         createNewProduct();
         updateProduct();
         deleteProduct();
@@ -31,7 +38,7 @@ public class JdbcCrud {
         selectProductsWithSales();
     }
 
-    private static void createNewProduct() {
+    private static void createNewProduct() throws SQLException {
         Product product = new Product("Pear", "Fruits", 9);
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
@@ -44,13 +51,15 @@ public class JdbcCrud {
 
             ps.executeUpdate();
 
+            logger.info("Создана новая запись в таблице products");
+
         } catch (SQLException e) {
-            System.out.println("Не удалось создать новую запись");
-            e.printStackTrace();
+            logger.error("Не удалось создать новую запись");
+            throw new SQLException(e);
         }
     }
 
-    private static void updateProduct() {
+    private static void updateProduct() throws SQLException {
 
         String productName = "Pear";
 
@@ -59,16 +68,16 @@ public class JdbcCrud {
                      connection.prepareStatement("UPDATE products SET in_stock = 10 WHERE product_name = ?")) {
 
             ps.setString(1, productName);
-            System.out.println(ps);
             ps.executeUpdate();
+            logger.info("Изменена запись в таблице products в строке с productName = '{}'", productName);
 
         } catch (SQLException e) {
-            System.out.println("Не удалось обновить запись");
-            e.printStackTrace();
+            logger.error("Не удалось изменить запись");
+            throw new SQLException(e);
         }
     }
 
-    private static void deleteProduct() {
+    private static void deleteProduct() throws SQLException {
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
              PreparedStatement ps =
@@ -78,13 +87,15 @@ public class JdbcCrud {
 
             ps.executeUpdate();
 
+            logger.info("Удалена запись из таблицы products с productName = '{}'", productName);
+
         } catch (SQLException e) {
-            System.out.println("Не удалось удалить запись из таблицы");
-            e.printStackTrace();
+            logger.error("Не удалось удалить запись из таблицы");
+            throw new SQLException(e);
         }
     }
 
-    private static void selectProduct() {
+    private static void selectProduct() throws SQLException {
 
         String productName = "carrot";
 
@@ -101,16 +112,16 @@ public class JdbcCrud {
                 product.setCategory(rs.getString("category"));
                 product.setInStock(rs.getInt("in_stock"));
 
-                System.out.println(product);
+                logger.info("Получена запись из таблицы products: {}", product);
             }
 
         } catch (SQLException e) {
-            System.out.println("Записи с product_name = " + productName + " не найдены");
-            e.printStackTrace();
+            logger.error("Не удалось получить запись из таблицы");
+            throw new SQLException(e);
         }
     }
 
-    private static void selectProductsWithSales() {
+    private static void selectProductsWithSales() throws SQLException {
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
              PreparedStatement ps =
@@ -127,20 +138,20 @@ public class JdbcCrud {
                 productsWithSales.setProductName(rs.getString("product_name"));
                 productsWithSales.setCategory(rs.getString("category"));
                 productsWithSales.setQuantity(rs.getInt("quantity"));
-                productsWithSales.setPrice(rs.getDouble("price"));
+                productsWithSales.setPrice(BigDecimal.valueOf(rs.getDouble("price")));
 
-                System.out.println(productsWithSales);
+                logger.info("{}", productsWithSales);
             }
 
         } catch (SQLException e) {
-            System.out.println("Записи по запросу не найдены");
-            e.printStackTrace();
+            logger.error("Не удалось получить записи из БД");
+            throw new SQLException(e);
         }
     }
 
     private static void createAndFillInTables() throws SQLException {
 
-        System.out.println("Создаём 2 таблицы: Products и Sales. Наполняем их данными");
+        logger.info("Создаём 2 таблицы: Products и Sales. Наполняем их данными");
 
         String dropProductsTable = "DROP TABLE IF EXISTS products";
         String dropSalesTable = "DROP TABLE IF EXISTS sales";
@@ -168,12 +179,12 @@ public class JdbcCrud {
         products.add(new Product("Cucumber", "Vegetables", 65));
 
         List<Sale> sales = new ArrayList<>();
-        sales.add(new Sale(1, 12, new BigDecimal("10.5")));
-        sales.add(new Sale(2, 15, new BigDecimal("11.75")));
-        sales.add(new Sale(3, 16, new BigDecimal("7.1")));
-        sales.add(new Sale(4, 8, new BigDecimal("2.43")));
-        sales.add(new Sale(5, 9, new BigDecimal("4.5")));
-        sales.add(new Sale(1, 3, new BigDecimal("14.5")));
+        sales.add(new Sale(1L, 12, new BigDecimal("10.5")));
+        sales.add(new Sale(2L, 15, new BigDecimal("11.75")));
+        sales.add(new Sale(3L, 16, new BigDecimal("7.1")));
+        sales.add(new Sale(4L, 8, new BigDecimal("2.43")));
+        sales.add(new Sale(5L, 9, new BigDecimal("4.5")));
+        sales.add(new Sale(1L, 3, new BigDecimal("14.5")));
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD)) {
 
@@ -202,7 +213,7 @@ public class JdbcCrud {
                              connection.prepareStatement("INSERT INTO sales (product_id, quantity, price) VALUES (?, ?, ?)")) {
 
                     for (Sale sale : sales) {
-                        ps.setInt(1, sale.getProductId());
+                        ps.setLong(1, sale.getProductId());
                         ps.setInt(2, sale.getQuantity());
                         ps.setBigDecimal(3, sale.getPrice());
 
@@ -215,7 +226,7 @@ public class JdbcCrud {
 
             } catch (SQLException e) {
                 connection.rollback();
-                System.out.println("Ошибка при создании и/или заполнении таблиц. Выполнен rollback");
+                logger.error("Ошибка при создании и/или заполнении таблиц. Выполнен rollback");
                 throw new SQLException("Не удалось создать и/или заполнить таблицу", e);
             }
         }

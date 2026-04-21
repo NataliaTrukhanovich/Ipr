@@ -1,14 +1,16 @@
 package pageObject;
 
 import core.BasePage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class MainPage extends BasePage {
 
-    @FindBy(xpath = "//img[@class='vkc__Avatar__img vkc__Avatar__size48 vkc__Avatar__square']")
+    @FindBy(xpath = "//div[contains(@class, 'vkc__ServiceAvatar-module__img')]//img")
     private WebElement avatar;
     @FindBy(xpath = "//h1[contains(text(), 'Вход в «Mail»')]")
     private WebElement title;
@@ -16,9 +18,9 @@ public class MainPage extends BasePage {
     private WebElement email;
     @FindBy(xpath = "//span[contains(text(), '@mail.ru')]")
     private WebElement host;
-    @FindBy(xpath = "//div[@class='vkc__Checkbox__icon vkc__Checkbox__checkboxOn']")
+    @FindBy(xpath = "//div[contains(@class, 'checkboxOn')]")
     private WebElement saveUserCheckbox;
-    @FindBy(xpath = "//div[@class='vkc__Checkbox__content']")
+    @FindBy(xpath = "//span[contains(text(), 'Сохранить вход')]")
     private WebElement saveUserCheckboxTitle;
     @FindBy(xpath = "//button[contains(@aria-label, 'сохранить данные аккаунта')]")
     private WebElement saveUserCheckboxIcon;
@@ -29,9 +31,11 @@ public class MainPage extends BasePage {
     @FindBy(xpath = "//span[@data-test-id='error-message']")
     private WebElement errorMessage;
 
+    @FindBy(xpath = "//span[contains(text(), 'Пропустить')]")
+    private WebElement vkButton;
+
     public MainPage(WebDriver driver) {
         super(driver);
-        PageFactory.initElements(driver, this);
     }
 
     public boolean isAvatarDisplayed() {
@@ -71,10 +75,10 @@ public class MainPage extends BasePage {
     }
 
     public boolean isSaveUserCheckboxOn() {
-        return saveUserCheckbox.getDomAttribute("class").contains("checkboxOn");
+        return saveUserCheckbox.isDisplayed();
     }
 
-    public Boolean isContinueButtonEnabled() {
+    public boolean isContinueButtonEnabled() {
         return continueButton.isEnabled();
     }
 
@@ -90,7 +94,28 @@ public class MainPage extends BasePage {
         email.sendKeys(emailName);
     }
 
-    public void submitButtonClick() {
+    public void clickSubmitButton() {
         continueButton.click();
     }
+
+    public void clickVkButton(){
+        vkButton.click();
+    }
+
+    public void setPass(String pass) {
+        try {
+            wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
+                    By.id("pass")));
+            WebElement inputPassword = driver.findElement(By.name("password"));
+            inputPassword.sendKeys(pass);
+            driver.switchTo().defaultContent();
+        } catch (NoSuchElementException e) {
+            WebElement inputPassword = driver.findElement(By.name("password"));
+            inputPassword.sendKeys(pass);
+        }
+
+        WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@data-test-id='submit']")));
+        submitButton.click();
+    }
+
 }

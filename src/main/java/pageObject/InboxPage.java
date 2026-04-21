@@ -1,14 +1,12 @@
 package pageObject;
 
 import core.BasePage;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class InboxPage extends BasePage {
 
@@ -17,10 +15,15 @@ public class InboxPage extends BasePage {
 
     public InboxPage(WebDriver driver) {
         super(driver);
-        PageFactory.initElements(driver, this);
     }
 
-    public Boolean checkValidAccountName() throws InterruptedException {
+    @Step("Ожидаем загрузку страницы")
+    public void waitPageLoading() {
+        waitForUrl("https://e.mail.ru/inbox");
+    }
+
+    @Step("Проверка, что выполнен вход в аккаунт {expectedEmail}")
+    public boolean checkValidAccountName(String expectedEmail) throws InterruptedException {
 
         WebElement profileIcon = driver.findElement(By.xpath("//div[contains(@class, 'ph-project__user-icon-mask')]"));
         Thread.sleep(5000);
@@ -29,14 +32,11 @@ public class InboxPage extends BasePage {
         WebElement sidebar = driver.findElement(By.xpath("//div[contains(@class,'ph-sidebar')]"));
         WebElement email = sidebar.findElement(By.xpath("//div[contains(@class,'ph-desc__email')]"));
         String actualEmail = email.getDomAttribute("aria-label").trim();
-        if (actualEmail.equals("testmail1025@mail.ru")) {
-            return true;
-        }
-
-        return false;
+        return actualEmail.equals(expectedEmail);
     }
 
-    public void sendEmptyMessage(String subject) throws InterruptedException {
+    @Step("Отправка письма на этот же почтовый ящик с темой сообщения {subject}")
+    public void sendLetterWithEmptyMessage(String subject) throws InterruptedException {
         composeButton.click();
         WebElement inputTo = driver.findElement(By.xpath("//input[@tabindex='100']"));
         inputTo.sendKeys("testmail1025@mail.ru");
@@ -52,22 +52,24 @@ public class InboxPage extends BasePage {
         closeButton.click();
     }
 
+    @Step("Переходим в папку Входящие")
     public void chooseMyselfLetters() {
         WebElement myselfLetters = driver.findElement(By.xpath("//div[@class='mt-h-c__content']//span[contains(@class, 'mt-t_tomyself')]"));
         myselfLetters.click();
     }
 
-    public boolean checkLetter(String subject) throws InterruptedException {
-        Thread.sleep(2000);
-        List<WebElement> lettersSubjects = new ArrayList<>();
-        lettersSubjects = driver.findElements(By.xpath("//span[@class='ll-sj__normal']"));
-        for (WebElement element : lettersSubjects
-        ) {
-            if (element.getText().equals(subject)) return true;
+    @Step("Поиск письма с темой {subject}")
+    public boolean checkLetter(String subject) {
+        try {
+            driver.findElement(By.xpath("//span[contains(text(), '" + subject + "')]"));
+            return true;
+        } catch (NoSuchElementException e) {
+            System.out.println("Письмо " + subject + " не найдено");
+            return false;
         }
-        return false;
     }
 
+    @Step("Удаление письма с темой {subject}")
     public void deleteLetter(String subject) {
         WebElement letter = driver.findElement(By.xpath("//span[contains(text(), '" + subject + "')]"));
         letter.click();

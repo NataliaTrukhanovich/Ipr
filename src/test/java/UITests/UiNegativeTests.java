@@ -1,5 +1,6 @@
 package UITests;
 
+import io.qameta.allure.Description;
 import org.junit.jupiter.api.*;
 import pageObject.MainPage;
 import core.BaseTest;
@@ -26,6 +27,7 @@ public class UiNegativeTests extends BaseTest {
 
     @Test
     @Order(1)
+    @Description("Проверка наличия обязательных элементов дизайна окна авторизации")
     public void designTest() {
         Assertions.assertTrue(mainPage.isAvatarDisplayed(), "Отсутствует логотип");
         Assertions.assertTrue(mainPage.isTitleDisplayed(), "Отсутствует заголовок");
@@ -40,6 +42,7 @@ public class UiNegativeTests extends BaseTest {
 
     @Test
     @Order(2)
+    @Description("Проверка, что чекбокс 'Сохранить вход' включен и кнопка 'Войти' неактивна")
     public void checkboxOnAndContinueButtonDisableTest() {
         Assertions.assertTrue(mainPage.isSaveUserCheckboxOn());
         Assertions.assertFalse(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' активна. Должна быть неактивной.");
@@ -47,6 +50,7 @@ public class UiNegativeTests extends BaseTest {
 
     @Test
     @Order(3)
+    @Description("Проверка, что кнопка 'Войти' активна, когда введён email")
     public void activeContinueButtonTest() {
         mainPage.setEmail("abc");
         Assertions.assertTrue(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' неактивна. Должна быть активной.");
@@ -54,9 +58,10 @@ public class UiNegativeTests extends BaseTest {
 
     @Test
     @Order(4)
+    @Description("Проверка сообщения об ошибке, когда введён неверный email")
     public void invalidEmailNameTest() {
-        mainPage.setEmail("ф");
-        mainPage.submitButtonClick();
+        mainPage.setEmail("ы");
+        mainPage.clickSubmitButton();
         Assertions.assertTrue(mainPage.isErrorMessageDisplayed());
         Assertions.assertEquals(mainPage.getErrorMessageText(), "Вы ввели несуществующее имя аккаунта [100]");
     }

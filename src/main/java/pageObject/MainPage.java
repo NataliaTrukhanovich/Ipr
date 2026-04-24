@@ -1,6 +1,7 @@
 package pageObject;
 
 import core.BasePage;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -90,18 +91,22 @@ public class MainPage extends BasePage {
         return errorMessage.getText();
     }
 
+    @Step("Вводим email {}")
     public void setEmail(String emailName) {
         email.sendKeys(emailName);
     }
 
+    @Step("Нажимаем кнопку 'Продолжить'")
     public void clickSubmitButton() {
         continueButton.click();
     }
 
-    public void clickVkButton(){
+    @Step("Нажимаем кнопку 'Войти'")
+    public void clickVkButton() {
         vkButton.click();
     }
 
+    @Step("Вводим пароль")
     public void setPass(String pass) {
         try {
             wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(

@@ -25,7 +25,7 @@ public class UiPositiveTests extends BaseTest {
     private final String TESTLETTER = "Test10";
 
     @BeforeAll
-    public void precondition() throws InterruptedException {
+    public void precondition() {
 
         driver.get(URL);
 
@@ -42,6 +42,7 @@ public class UiPositiveTests extends BaseTest {
     @Order(1)
     @Description("Проверка url загруженной страницы")
     public void checkUrlTest() {
+
         inboxPage.waitPageLoading();
         Assertions.assertEquals("https://e.mail.ru/inbox", driver.getCurrentUrl());
 
@@ -50,9 +51,9 @@ public class UiPositiveTests extends BaseTest {
     @Test
     @Order(2)
     @Description("Проверка имени аккаунта")
-    public void loginPositiveTest() throws InterruptedException {
-
-        Assertions.assertTrue(inboxPage.checkValidAccountName("testmail1025@mail.ru"));
+    public void loginPositiveTest() {
+        inboxPage.closeAdIfPresent();
+        Assertions.assertEquals("testmail1025@mail.ru", inboxPage.getAccountName());
 
     }
 

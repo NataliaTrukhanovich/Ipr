@@ -138,7 +138,7 @@ public class JdbcCrud {
                 productsWithSales.setProductName(rs.getString("product_name"));
                 productsWithSales.setCategory(rs.getString("category"));
                 productsWithSales.setQuantity(rs.getInt("quantity"));
-                productsWithSales.setPrice(BigDecimal.valueOf(rs.getDouble("price")));
+                productsWithSales.setPrice(rs.getBigDecimal("price"));
 
                 logger.info("{}", productsWithSales);
             }

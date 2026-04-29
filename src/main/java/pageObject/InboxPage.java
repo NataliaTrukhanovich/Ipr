@@ -57,7 +57,8 @@ public class InboxPage extends BasePage {
 
     @Step("Переходим в папку Входящие")
     public void chooseMyselfLetters() {
-        WebElement myselfLetters = driver.findElement(By.xpath("//div[@class='mt-h-c__content']//span[contains(@class, 'mt-t_tomyself')]"));
+        WebElement myselfLetters = wait.until(
+                ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='mt-h-c__content']//span[contains(@class, 'mt-t_tomyself')]")));
         myselfLetters.click();
     }
 

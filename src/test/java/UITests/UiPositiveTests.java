@@ -3,7 +3,15 @@ package UITests;
 import core.BaseTest;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import pageObject.ConfirmationPage;
 import pageObject.InboxPage;
 import pageObject.MainPage;
@@ -60,9 +68,8 @@ public class UiPositiveTests extends BaseTest {
     @Test
     @Order(3)
     @Description("Проверка отправки письма")
-    public void sendMessageTest() throws InterruptedException {
+    public void sendMessageTest() {
         inboxPage.sendLetterWithEmptyMessage(TESTLETTER);
-        Thread.sleep(5000);
         inboxPage.chooseMyselfLetters();
         Assertions.assertTrue(inboxPage.checkLetter(TESTLETTER));
 

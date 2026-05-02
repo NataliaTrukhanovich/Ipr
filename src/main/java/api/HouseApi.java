@@ -1,47 +1,49 @@
 package api;
 
-import api.models.Person;
+import api.models.House;
 
 import static io.restassured.RestAssured.given;
 
-public class PersonApi extends BaseApi{
+public class HouseApi extends BaseApi{
 
-    public Person createPerson(Person person){
+    public House createHouse(House house){
         return given()
                 .spec(requestSpec)
-                .body(person)
+                .log().all()
+                .body(house)
                 .when()
-                .post("/user")
+                .post("/house")
                 .then()
                 .log().all()
                 .statusCode(201)
                 .extract()
-                .as(Person.class);
+                .as(House.class);
     }
 
-    public Person getPersonById(Integer id){
+    public House getHouse(Integer id){
         return given()
                 .spec(requestSpec)
                 .pathParam("id", id)
                 .when()
-                .get("/user/{id}")
+                .get("/house/{id}")
                 .then()
                 .log().all()
                 .statusCode(200)
                 .extract()
-                .as(Person.class);
+                .as(House.class);
     }
 
-    public Person buyCar(Integer personId, Integer carId){
+    public House settlePerson(Integer houseId, Integer userId){
         return given()
                 .spec(requestSpec)
-                .pathParams("userId", personId, "carId", carId)
+                .pathParams("houseId", houseId, "userId", userId)
+                .log().all()
                 .when()
-                .post("/user/{userId}/buyCar/{carId}")
+                .post("/house/{houseId}/settle/{userId}")
                 .then()
                 .log().all()
-                //.statusCode(200)
+                .statusCode(200)
                 .extract()
-                .as(Person.class);
+                .as(House.class);
     }
 }

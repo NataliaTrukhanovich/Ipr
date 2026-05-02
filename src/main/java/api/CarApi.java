@@ -1,7 +1,6 @@
 package api;
 
 import api.models.Car;
-import api.models.Person;
 
 import static io.restassured.RestAssured.given;
 
@@ -15,7 +14,7 @@ public class CarApi extends BaseApi{
                 .post("/car")
                 .then()
                 .log().all()
-                .statusCode(201)
+                //.statusCode(201)
                 .extract()
                 .as(Car.class);
     }

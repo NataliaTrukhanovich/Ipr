@@ -9,12 +9,14 @@ import io.restassured.specification.ResponseSpecification;
 import static services.ConfigProvider.config;
 public class Specifications {
 
-    public static RequestSpecification requestSpec() {
+   String token = AuthApi.getToken(config.getString("api_username"), config.getString("api_password"));
+
+    public RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
                 .setBaseUri(config.getString("base_uri"))
                 .setContentType("application/json")
                 .setAccept("application/json")
-                .addHeader("Authorization", AuthApi.getToken(config.getString("api_username"), config.getString("api_password")))
+                .addHeader("Authorization", "Bearer " + token)
                 .log(io.restassured.filter.log.LogDetail.ALL)
                 .build();
     }

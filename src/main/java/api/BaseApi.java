@@ -6,11 +6,13 @@ import io.restassured.specification.ResponseSpecification;
 
 public class BaseApi {
 
+    Specifications spec = new Specifications();
+
     protected RequestSpecification requestSpec;
    // protected ResponseSpecification responseSpec200;
 
     public BaseApi() {
-        this.requestSpec = Specifications.requestSpec();
+        this.requestSpec = spec.requestSpec();
        // this.responseSpec200 = Specifications.responseSpec200();
     }
 }

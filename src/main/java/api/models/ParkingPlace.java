@@ -12,4 +12,10 @@ public class ParkingPlace {
     private Boolean isWarm;
     private Boolean isCovered;
     private Integer placesCount;
+
+    public ParkingPlace(Boolean isWarm, Boolean isCovered, Integer placesCount) {
+        this.isWarm = isWarm;
+        this.isCovered = isCovered;
+        this.placesCount = placesCount;
+    }
 }

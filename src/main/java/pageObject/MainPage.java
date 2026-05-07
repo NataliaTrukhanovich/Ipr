@@ -31,7 +31,6 @@ public class MainPage extends BasePage {
     private WebElement signupButton;
     @FindBy(xpath = "//span[@data-test-id='error-message']")
     private WebElement errorMessage;
-
     @FindBy(xpath = "//span[contains(text(), 'Пропустить')]")
     private WebElement vkButton;
 

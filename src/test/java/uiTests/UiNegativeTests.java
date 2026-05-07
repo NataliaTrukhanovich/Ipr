@@ -1,4 +1,4 @@
-package UITests;
+package uiTests;
 
 import io.qameta.allure.Description;
 
@@ -18,14 +18,12 @@ import static services.ConfigProvider.config;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UiNegativeTests extends BaseTest {
-    private MainPage mainPage;
-    private String url = config.getString("url");
+    private MainPage mainPage = new MainPage(driver);;
+    private String url = config.getString("ui.url");
 
     @BeforeAll
     public void precondition() {
         driver.get(url);
-
-        mainPage = new MainPage(driver);
     }
 
     @BeforeEach
@@ -71,6 +69,6 @@ public class UiNegativeTests extends BaseTest {
         mainPage.setEmail("ы");
         mainPage.clickSubmitButton();
         Assertions.assertTrue(mainPage.isErrorMessageDisplayed());
-        Assertions.assertEquals(mainPage.getErrorMessageText(), "Вы ввели несуществующее имя аккаунта [100]");
+        Assertions.assertEquals("Вы ввели несуществующее имя аккаунта [100]", mainPage.getErrorMessageText());
     }
 }

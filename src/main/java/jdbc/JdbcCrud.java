@@ -23,9 +23,9 @@ import static services.ConfigProvider.config;
 public class JdbcCrud {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcCrud.class);
-    static final String DB_URL = config.getString("db_url");
-    static final String USER = config.getString("db_user");
-    static final String PWD = config.getString("db_pass");
+    static final String DB_URL = config.getString("db.db_url");
+    static final String USER = config.getString("db.db_user");
+    static final String PWD = config.getString("db.db_pass");
 
     public static void main(String[] args) throws SQLException {
 

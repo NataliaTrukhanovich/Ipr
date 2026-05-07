@@ -20,6 +20,20 @@ public class HouseApi extends BaseApi{
                 .as(House.class);
     }
 
+    public House updateHouse(Integer id, House house){
+        return given()
+                .spec(requestSpec)
+                .pathParam("id", id)
+                .log().all()
+                .body(house)
+                .when()
+                .put("/house/{id}")
+                .then()
+                //.statusCode(201)
+                .extract()
+                .as(House.class);
+    }
+
     public House getHouse(Integer id){
         return given()
                 .spec(requestSpec)
@@ -40,6 +54,20 @@ public class HouseApi extends BaseApi{
                 .log().all()
                 .when()
                 .post("/house/{houseId}/settle/{userId}")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .as(House.class);
+    }
+
+    public House evictPerson(Integer houseId, Integer userId){
+        return given()
+                .spec(requestSpec)
+                .pathParams("houseId", houseId, "userId", userId)
+                .log().all()
+                .when()
+                .post("/house/{houseId}/evict/{userId}")
                 .then()
                 .log().all()
                 .statusCode(200)

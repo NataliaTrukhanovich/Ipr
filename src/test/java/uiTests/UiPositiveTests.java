@@ -1,4 +1,4 @@
-package UITests;
+package uiTests;
 
 import core.BaseTest;
 import io.qameta.allure.Description;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import pageObject.ConfirmationPage;
 import pageObject.InboxPage;
 import pageObject.MainPage;
 
@@ -25,11 +24,10 @@ import static services.ConfigProvider.config;
 public class UiPositiveTests extends BaseTest {
 
     private MainPage mainPage;
-    private ConfirmationPage confirmationPage;
     private InboxPage inboxPage;
-    private final String URL = config.getString("url");
-    private String email = config.getString("email");
-    private String pass = config.getString("pass");
+    private final String URL = config.getString("ui.url");
+    private String email = config.getString("ui.email");
+    private String pass = config.getString("ui.pass");
     private final String TESTLETTER = "Test10";
 
     @BeforeAll

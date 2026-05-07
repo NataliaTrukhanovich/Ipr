@@ -6,3 +6,6 @@ allure-results/
 *.iws
 *.iml
 *.ipr
+
+### Local configs ###
+application-local.conf

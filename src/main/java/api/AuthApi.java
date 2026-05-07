@@ -5,15 +5,14 @@ import api.models.Auth;
 import static io.restassured.RestAssured.given;
 import static services.ConfigProvider.config;
 
-public class AuthApi extends BaseApi{
-
+public class AuthApi extends BaseApi {
 
 
     public static String getToken(String username, String password) {
 
         return
                 given()
-                        .baseUri(config.getString("base_uri"))
+                        .baseUri(config.getString("api.base_uri"))
                         .contentType("application/json")
                         .body(new Auth(username, password))
                         .log().all()

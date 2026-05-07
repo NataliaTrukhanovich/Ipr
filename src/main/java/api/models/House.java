@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,10 +14,10 @@ public class House {
     private Integer id;
     private Integer floorCount;
     private BigDecimal price;
-    private ArrayList<ParkingPlace> parkingPlaces;
-    private ArrayList<Person> lodgers;
+    private List<ParkingPlace> parkingPlaces;
+    private List<Person> lodgers;
 
-    public House(Integer floorCount, BigDecimal price, ArrayList<ParkingPlace> parkingPlaces, ArrayList<Person> lodgers) {
+    public House(Integer floorCount, BigDecimal price, List<ParkingPlace> parkingPlaces, List<Person> lodgers) {
         this.floorCount = floorCount;
         this.price = price;
         this.parkingPlaces = parkingPlaces;

@@ -5,7 +5,7 @@ import io.restassured.specification.RequestSpecification;
 
 public class BaseApi {
 
-    Specifications spec = new Specifications();
+    protected Specifications spec = new Specifications();
 
     protected RequestSpecification requestSpec;
 

@@ -1,29 +1,33 @@
 package uiTests;
 
+import core.BaseTest;
 import io.qameta.allure.Description;
-
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
 import pageObject.MainPage;
-import core.BaseTest;
 
 import static services.ConfigProvider.config;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UiNegativeTests extends BaseTest {
-    private MainPage mainPage = new MainPage(driver);;
-    private String url = config.getString("ui.url");
+@DisplayName("Web тесты. Форма авторизации")
+@Epic("UI")
+@Feature("Форма авторизации")
+public class LoginTests extends BaseTest {
+
+    private MainPage mainPage;
+    private final String url = config.getString("ui.url");
 
     @BeforeAll
     public void precondition() {
         driver.get(url);
+        mainPage = new MainPage(driver);
     }
 
     @BeforeEach
@@ -32,8 +36,8 @@ public class UiNegativeTests extends BaseTest {
     }
 
     @Test
-    @Order(1)
     @Description("Проверка наличия обязательных элементов дизайна окна авторизации")
+    @Story("Отображение формы авторизации")
     public void designTest() {
         Assertions.assertTrue(mainPage.isAvatarDisplayed(), "Отсутствует логотип");
         Assertions.assertTrue(mainPage.isTitleDisplayed(), "Отсутствует заголовок");
@@ -47,24 +51,24 @@ public class UiNegativeTests extends BaseTest {
     }
 
     @Test
-    @Order(2)
     @Description("Проверка, что чекбокс 'Сохранить вход' включен и кнопка 'Войти' неактивна")
+    @Story("Валидация формы")
     public void checkboxOnAndContinueButtonDisableTest() {
-        Assertions.assertTrue(mainPage.isSaveUserCheckboxOn());
-        Assertions.assertFalse(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' активна. Должна быть неактивной.");
+        Assertions.assertTrue(mainPage.isSaveUserCheckboxOn(), "Чекбокс 'Сохранить вход' выключен. Должен быть включен");
+        Assertions.assertFalse(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' активна. Должна быть неактивной");
     }
 
     @Test
-    @Order(3)
     @Description("Проверка, что кнопка 'Войти' активна, когда введён email")
+    @Story("Валидация формы")
     public void activeContinueButtonTest() {
         mainPage.setEmail("abc");
-        Assertions.assertTrue(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' неактивна. Должна быть активной.");
+        Assertions.assertTrue(mainPage.isContinueButtonEnabled(), "Кнопка 'Войти' неактивна. Должна быть активной");
     }
 
     @Test
-    @Order(4)
     @Description("Проверка сообщения об ошибке, когда введён неверный email")
+    @Story("Ошибки авторизации")
     public void invalidEmailNameTest() {
         mainPage.setEmail("ы");
         mainPage.clickSubmitButton();

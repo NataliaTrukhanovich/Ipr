@@ -12,9 +12,6 @@ public class Specifications {
 
     public RequestSpecification requestSpec() {
 
-        System.out.println("API CONFIG: " + config.getConfig("api"));
-        System.out.println("BASE URI: " + config.getString("api.base_uri"));
-
         return new RequestSpecBuilder()
                 .setBaseUri(config.getString("api.base_uri"))
                 .setContentType("application/json")

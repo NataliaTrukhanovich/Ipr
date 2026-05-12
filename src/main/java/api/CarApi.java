@@ -14,7 +14,7 @@ public class CarApi extends BaseApi{
                 .post("/car")
                 .then()
                 .log().all()
-                //.statusCode(201)
+                .statusCode(201)
                 .extract()
                 .as(Car.class);
     }

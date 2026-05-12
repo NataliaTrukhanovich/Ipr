@@ -1,6 +1,8 @@
 package core;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,4 +24,15 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.urlToBe(url));
     }
 
+    protected WebElement getElement(By locator) {
+        return driver.findElement(locator);
+    }
+
+    protected void clickElement(By locator) {
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+    }
+
+    protected void typeText(By locator, String text) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).sendKeys(text);
+    }
 }

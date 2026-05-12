@@ -39,12 +39,10 @@ public class MainPage extends BasePage {
     }
 
     public boolean isAvatarDisplayed() {
-        return avatar.isDisplayed();
-    }
+        return avatar.isDisplayed(); }
 
     public boolean isTitleDisplayed() {
-        return title.isDisplayed();
-    }
+        return title.isDisplayed(); }
 
     public boolean isEmailDisplayed() {
         return email.isDisplayed();
@@ -90,7 +88,7 @@ public class MainPage extends BasePage {
         return errorMessage.getText();
     }
 
-    @Step("Вводим email {}")
+    @Step("Вводим email {emailName}")
     public void setEmail(String emailName) {
         email.sendKeys(emailName);
     }
@@ -110,16 +108,13 @@ public class MainPage extends BasePage {
         try {
             wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
                     By.id("pass")));
-            WebElement inputPassword = driver.findElement(By.name("password"));
-            inputPassword.sendKeys(pass);
+            typeText(By.name("password"), pass);
             driver.switchTo().defaultContent();
         } catch (NoSuchElementException e) {
-            WebElement inputPassword = driver.findElement(By.name("password"));
-            inputPassword.sendKeys(pass);
+            typeText(By.name("password"), pass);
         }
 
-        WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@data-test-id='submit']")));
-        submitButton.click();
+        clickElement(By.xpath("//button[@data-test-id='submit']"));
     }
 
 }

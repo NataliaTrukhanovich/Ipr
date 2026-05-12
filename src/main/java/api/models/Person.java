@@ -25,16 +25,4 @@ public class Person {
         this.sex = sex;
         this.money = money;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(secondName, person.secondName) && Objects.equals(age, person.age) && Objects.equals(sex, person.sex) && Objects.equals(money, person.money);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, secondName, age, sex, money);
-    }
 }

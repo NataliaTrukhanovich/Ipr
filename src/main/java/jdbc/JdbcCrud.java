@@ -8,13 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-
-import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +19,9 @@ import static services.ConfigProvider.config;
 public class JdbcCrud {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcCrud.class);
-    static final String DB_URL = config.getString("db.db_url");
-    static final String USER = config.getString("db.db_user");
-    static final String PWD = config.getString("db.db_pass");
+    private static final String DB_URL = config.getString("db.db_url");
+    private static final String USER = config.getString("db.db_user");
+    private static final String PWD = config.getString("db.db_pass");
 
     public static void main(String[] args) throws SQLException {
 
@@ -39,11 +35,10 @@ public class JdbcCrud {
     }
 
     private static void createNewProduct() throws SQLException {
-        Product product = new Product("Pear", "Fruits", 9);
+        var product = new Product("Pear", "Fruits", 9);
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
-             PreparedStatement ps =
-                     connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD);
+             var ps = connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
 
             ps.setString(1, product.getProductName());
             ps.setString(2, product.getCategory());
@@ -61,11 +56,10 @@ public class JdbcCrud {
 
     private static void updateProduct() throws SQLException {
 
-        String productName = "Pear";
+        var productName = "Pear";
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
-             PreparedStatement ps =
-                     connection.prepareStatement("UPDATE products SET in_stock = 10 WHERE product_name = ?")) {
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD);
+             var ps = connection.prepareStatement("UPDATE products SET in_stock = 10 WHERE product_name = ?")) {
 
             ps.setString(1, productName);
             ps.executeUpdate();
@@ -79,10 +73,11 @@ public class JdbcCrud {
 
     private static void deleteProduct() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
-             PreparedStatement ps =
-                     connection.prepareStatement("DELETE FROM products WHERE product_name = ?")) {
-            String productName = "apple";
+        var productName = "apple";
+
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD);
+             var ps = connection.prepareStatement("DELETE FROM products WHERE product_name = ?")) {
+
             ps.setString(1, productName);
 
             ps.executeUpdate();
@@ -97,11 +92,11 @@ public class JdbcCrud {
 
     private static void selectProduct() throws SQLException {
 
-        String productName = "carrot";
+        var productName = "carrot";
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
-             PreparedStatement ps =
-                     connection.prepareStatement("SELECT * FROM products WHERE product_name = ?")) {
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD);
+             var ps = connection.prepareStatement("SELECT * FROM products WHERE product_name = ?")) {
+
             ps.setString(1, productName);
 
             ResultSet rs = ps.executeQuery();
@@ -123,9 +118,8 @@ public class JdbcCrud {
 
     private static void selectProductsWithSales() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD);
-             PreparedStatement ps =
-                     connection.prepareStatement("SELECT p.product_id, p.product_name, p.category, " +
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD);
+             var ps = connection.prepareStatement("SELECT p.product_id, p.product_name, p.category, " +
                              "s.quantity, s.price " +
                              "FROM products p " +
                              "JOIN sales s " +
@@ -153,16 +147,16 @@ public class JdbcCrud {
 
         logger.info("Создаём 2 таблицы: Products и Sales. Наполняем их данными");
 
-        String dropProductsTable = "DROP TABLE IF EXISTS products";
-        String dropSalesTable = "DROP TABLE IF EXISTS sales";
+        var dropProductsTable = "DROP TABLE IF EXISTS products";
+        var dropSalesTable = "DROP TABLE IF EXISTS sales";
 
-        String createProductsTable = " CREATE TABLE IF NOT EXISTS products (" +
+        var createProductsTable = " CREATE TABLE IF NOT EXISTS products (" +
                 "product_id   BIGINT NOT NULL AUTO_INCREMENT, " +
                 "product_name VARCHAR(50) NOT NULL, " +
                 "category     VARCHAR(50), " +
                 "in_stock     INT," +
                 "PRIMARY KEY (product_id))";
-        String createSalesTable = "CREATE TABLE IF NOT EXISTS sales (" +
+        var createSalesTable = "CREATE TABLE IF NOT EXISTS sales (" +
                 "sale_id     BIGINT NOT NULL AUTO_INCREMENT," +
                 "product_id  BIGINT NOT NULL," +
                 "quantity    INT NOT NULL, " +
@@ -186,19 +180,19 @@ public class JdbcCrud {
         sales.add(new Sale(5L, 9, new BigDecimal("4.5")));
         sales.add(new Sale(1L, 3, new BigDecimal("14.5")));
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PWD)) {
+        try (var connection = DriverManager.getConnection(DB_URL, USER, PWD)) {
 
             connection.setAutoCommit(false);
+
             try {
-                try (Statement stm = connection.createStatement()) {
+                try (var stm = connection.createStatement()) {
                     stm.executeUpdate(dropSalesTable);
                     stm.executeUpdate(dropProductsTable);
                     stm.executeUpdate(createProductsTable);
                     stm.executeUpdate(createSalesTable);
                 }
 
-                try (PreparedStatement ps =
-                             connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
+                try (var ps = connection.prepareStatement("INSERT INTO products (product_name, category, in_stock) VALUES (?, ?, ?)")) {
 
                     for (Product product : products) {
                         ps.setString(1, product.getProductName());
@@ -209,8 +203,7 @@ public class JdbcCrud {
                     }
                     ps.executeBatch();
                 }
-                try (PreparedStatement ps =
-                             connection.prepareStatement("INSERT INTO sales (product_id, quantity, price) VALUES (?, ?, ?)")) {
+                try (var ps = connection.prepareStatement("INSERT INTO sales (product_id, quantity, price) VALUES (?, ?, ?)")) {
 
                     for (Sale sale : sales) {
                         ps.setLong(1, sale.getProductId());

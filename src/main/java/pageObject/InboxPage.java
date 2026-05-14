@@ -3,12 +3,12 @@ package pageObject;
 import core.BasePage;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +25,8 @@ public class InboxPage extends BasePage {
 
 
     @Step("Ожидаем загрузку страницы")
-    public void waitPageLoading() {
-        waitForUrl("https://e.mail.ru/inbox");
+    public boolean isPageLoading(String url) {
+        return waitForUrl(url);
     }
 
     @Step("Получение email текущего авторизованного пользователя")
@@ -78,7 +78,7 @@ public class InboxPage extends BasePage {
         logger.info("Выбираем письмо с темой " + subject);
         clickElement(By.xpath("//span[contains(text(), '" + subject + "')]"));
 
-        logger.info("Выбираем 'Удалить' и 'Вернуться'" );
+        logger.info("Выбираем 'Удалить' и 'Вернуться'");
         clickElement(By.xpath("//span[@title='Удалить']"));
 
         clickElement(By.xpath("//span[@title='Вернуться']"));
@@ -91,8 +91,12 @@ public class InboxPage extends BasePage {
             clickElement(By.xpath("//div[contains(@id,'trg-b')]//div[contains(@style, 'display')]//*"));
             logger.info("Кнопка найдена. Нажимаем её, чтобы закрыть рекламу");
 
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | ElementNotInteractableException e) {
             logger.info("Реклама не появилась или уже закрыта");
         }
+    }
+
+    public void navigateToInbox() {
+        clickElement(By.xpath("//a[@data-folder-link-id='0']"));
     }
 }

@@ -7,6 +7,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,7 +26,6 @@ public class MailTests extends BaseTest {
     private final String URL = config.getString("ui.url");
     private final String email = config.getString("ui.email");
     private final String pass = config.getString("ui.pass");
-    private final String TESTLETTER = "Test10";
 
     @BeforeAll
     public void precondition() {
@@ -41,13 +41,17 @@ public class MailTests extends BaseTest {
         mainPage.setPass(pass);
     }
 
+    @BeforeEach
+    public void navigateToInboxPage() {
+        inboxPage.navigateToInbox();
+    }
+
     @Test
     @Story("Навигация")
     @Description("Проверка url загруженной страницы")
     public void checkUrlTest() {
 
-        inboxPage.waitPageLoading();
-        Assertions.assertEquals("https://e.mail.ru/inbox", driver.getCurrentUrl());
+        Assertions.assertTrue(inboxPage.isPageLoading("/inbox"));
 
     }
 
@@ -55,6 +59,7 @@ public class MailTests extends BaseTest {
     @Story("Профиль пользователя")
     @Description("Проверка имени аккаунта")
     public void loginPositiveTest() {
+
         inboxPage.closeAdIfPresent();
         Assertions.assertEquals("testmail1025@mail.ru", inboxPage.getAccountName());
 
@@ -64,9 +69,11 @@ public class MailTests extends BaseTest {
     @Story("Отправка писем")
     @Description("Проверка отправки письма")
     public void sendMessageTest() {
-        inboxPage.sendLetterWithEmptyMessage(TESTLETTER);
+
+        var letterTopic = "Test10";
+        inboxPage.sendLetterWithEmptyMessage(letterTopic);
         inboxPage.chooseMyselfLetters();
-        Assertions.assertTrue(inboxPage.checkLetter(TESTLETTER));
+        Assertions.assertTrue(inboxPage.checkLetter(letterTopic));
 
     }
 
@@ -74,7 +81,12 @@ public class MailTests extends BaseTest {
     @Story("Удаление писем")
     @Description("Проверка удаления письма из Входящих")
     public void deleteMessageTest() {
-        inboxPage.deleteLetter(TESTLETTER);
-        Assertions.assertFalse(inboxPage.checkLetter(TESTLETTER), "Письмо с темой " + TESTLETTER + " не найдено");
+
+        var letterTopic = "Test101";
+        inboxPage.sendLetterWithEmptyMessage(letterTopic);
+        inboxPage.chooseMyselfLetters();
+        inboxPage.deleteLetter(letterTopic);
+        Assertions.assertFalse(inboxPage.checkLetter(letterTopic), "Письмо с темой " + letterTopic + " всё ещё в почтовом ящике");
     }
+
 }

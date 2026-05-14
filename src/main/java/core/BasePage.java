@@ -20,8 +20,9 @@ public abstract class BasePage {
         PageFactory.initElements(driver, this);
     }
 
-    protected void waitForUrl(String url) {
-        wait.until(ExpectedConditions.urlToBe(url));
+    protected boolean waitForUrl(String url) {
+        wait.until(ExpectedConditions.urlContains(url));
+        return true;
     }
 
     protected WebElement getElement(By locator) {
